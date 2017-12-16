@@ -64,7 +64,7 @@ set tabstop=4
 " 统一缩进为4
 set softtabstop=4
 set shiftwidth=4
-" 不要用空格代替制表符
+" 使用空格代替制表符
 set expandtab
 " 在行和段开始处使用制表符
 set smarttab
@@ -172,6 +172,7 @@ map <S-Right> :tabn<CR>
 map! <C-Z> <Esc>zzi
 map! <C-O> <C-Y>,
 map <C-A> ggVG$"+y
+map <Esc><Esc> :w<CR>
 map <F12> gg=G
 map <C-w> <C-w>w
 imap <C-k> <C-y>,
@@ -205,7 +206,7 @@ func! CompileRunGcc()
 		exec "!g++ % -o %<"
 		exec "!time ./%<"
 	elseif &filetype == 'cpp'
-		exec "!g++ % -o %<"
+		exec "!g++ % -std=c++11 -o %<"
 		exec "!time ./%<"
 	elseif &filetype == 'java' 
 		exec "!javac %" 
@@ -228,7 +229,7 @@ endfunc
 map <F8> :call Rungdb()<CR>
 func! Rungdb()
 	exec "w"
-	exec "!g++ % -g -o %<"
+	exec "!g++ % -std=c++11 -g -o %<"
 	exec "!gdb ./%<"
 endfunc
 
@@ -261,9 +262,6 @@ func FormartSrc()
     exec "e! %"
 endfunc
 "结束定义FormartSrc
-
-
-
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -323,7 +321,7 @@ set backspace=2
 " 允许backspace和光标键跨越行边界
 set whichwrap+=<,>,h,l
 " 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位）
-set mouse=a
+set mouse=v
 set selection=exclusive
 set selectmode=mouse,key
 " 通过使用: commands命令，告诉我们文件的哪一行被改变过
@@ -367,17 +365,8 @@ let Tlist_Exist_OnlyWindow = 1  " 如果只有一个buffer，kill窗口也kill�
 ""let Tlist_Enable_Fold_Column = 0    " 不要显示折叠树  
 "let Tlist_Show_One_File=1            "不同时显示多个文件的tag，只显示当前文件的
 "设置tags  
-"set tags=tags  
-"set autochdir 
-
-
-
-
-
-
-
-
-
+set tags=tags;  
+set autochdir 
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -399,16 +388,6 @@ let g:miniBufExplMapWindowNavArrows = 1
 let g:miniBufExplMapCTabSwitchBufs = 1
 let g:miniBufExplModSelTarget = 1  
 nmap tl :Tlist<cr>
-
-
-
-"输入法
-:let g:vimim_map='c-/'
-":let g:vimim_cloud='sougou' " QQ云输入
-:let g:vimim_punctuation=0	" 不用中文标点
-:set pastetoggle=<C-H>
-:let g:vimim_cloud=-1
-
 
 "python补全
 let g:pydiction_location = '~/.vim/after/complete-dict'
@@ -449,7 +428,7 @@ let g:indentLine_char = '┊'
 Bundle 'L9'
 Bundle 'FuzzyFinder'
 " non github repos
-Bundle 'git://git.wincent.com/command-t.git'
+Bundle 'https://github.com/wincent/command-t.git'
 Bundle 'Auto-Pairs'
 Bundle 'python-imports.vim'
 Bundle 'CaptureClipboard'
@@ -481,16 +460,6 @@ let g:html_indent_style1 = "inc"
 
 filetype plugin indent on     " required!
 "
-" Brief help
-" :BundleList          - list configured bundles
-" :BundleInstall(!)    - install(update) bundles
-" :BundleSearch(!) foo - search(or refresh cache first) for foo
-" :BundleClean(!)      - confirm(or auto-approve) removal of unused bundles
-"
-" see :h vundle for more details or wiki for FAQ
-" NOTE: comments after Bundle command are not allowed..
-"
-"
 "ctrlp设置
 "
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.png,*.jpg,*.gif     " MacOSX/Linux
@@ -501,3 +470,131 @@ let g:ctrlp_custom_ignore = '\v\.(exe|so|dll)$'
 let g:ctrlp_extensions = ['funky']
 
 let NERDTreeIgnore=['\.pyc']
+
+
+"scope 设置：
+
+" Jump to last known curson position.
+autocmd BufReadPost *
+  \ if line("'\"") > 0 && line("'\"") <= line("$") |
+  \   exe "normal! g`\"" |
+  \ endif
+
+" Convenient command to see the difference between the current buffer and the
+" file it was loaded from, thus the changes you made.
+command Di vert new | set bt=nofile | r # | 0d_ | diffthis
+	 	\ | wincmd p | diffthis
+
+" Command to reload the buffer
+command Re let position = getpos(".") | %d | r | 1d | call setpos(".", position)
+
+" vim -b : edit binary using xxd-format!
+augroup Binary
+  au!
+  au BufReadPre  *.bin let &bin=1
+  au BufReadPost *.bin if &bin | %!xxd
+  au BufReadPost *.bin set ft=xxd | endif
+  au BufWritePre *.bin if &bin | %!xxd -r
+  au BufWritePre *.bin endif
+  au BufWritePost *.bin if &bin | %!xxd
+  au BufWritePost *.bin set nomod | endif
+augroup END
+
+" Start key map
+nmap gr :grep <C-R><C-W> `find ../blazer/src -name '*.[chsS]'`<S-Left><S-Left><S-Left><S-Right>
+" nmap ,e :e <C-R>=expand("%:p:h") . "/" <CR>
+set noautochdir		" Make sure ',e' works correctly
+nmap ,e :e <C-R>%<C-w><C-w><C-w>
+" nmap <C-c> :call setreg('+',  @*)<CR>
+nmap <C-c> :let @+=@*<CR>
+vmap <C-c> "+y
+imap <C-e> <C-o><C-e>
+imap <C-y> <C-o><C-y>
+
+" map <F4> :source $VIMRUNTIME/folder.vim<CR>
+"map <F3> :cs reset<CR>
+"map <F4> :w<CR>:!if [ -f [Mm]akefile ]; then make xen >& /dev/null; fi<CR>
+"map <F5> :w<CR>:!if [ -f [Mm]akefile ]; then make >& /dev/null; fi<CR>
+"map <F6> :cc<CR>
+"map <F7> :cn<CR>
+"map <F8> :w<CR>:make<CR>
+" map <F12> :if (&hlsearch == 1) <Bar> set nohlsearch <Bar> else <Bar> set hlsearch <Bar> endif <CR>
+
+"set pastetoggle=<F2>
+"imap <F3> <ESC><F3>
+"imap <F4> <ESC><F4>
+"imap <F5> <ESC><F5>
+"imap <F6> <ESC><F6>
+"imap <F7> <ESC><F7>
+"imap <F8> <ESC><F8>
+" imap <F12> <ESC><F12>
+
+imap ``` printf("");<left><left><left>
+
+set nocsverb	" suppress error
+" set cscopequickfix=s-,c-,d-,i-,t-,e-,g-
+" set cscopequickfix=s-,t-
+" cs add ~/tmp/cscope.out ~/tmp/src
+cs add ~/tmp/cscope.out
+
+" map <F3> :cs find g <C-R>=expand("<cword>")<CR><CR>
+" imap <F3> <ESC>:cs find g <C-R>=expand("<cword>")<CR><CR>
+nmap <C-[>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+nmap <C-[>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+nmap <C-[>c :cs find c <C-R>=expand("<cword>")<CR><CR>
+nmap <C-[>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+nmap <C-[>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+nmap <C-[>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+nmap <C-[>i :cs find i <C-R>=expand("<cfile>")<CR><CR>
+nmap <C-[>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+
+" Using 'ESC' then a search type makes the vim window
+" split horizontally, with search result displayed in
+" the new window.
+
+" map <F2> :scs find g <C-R>=expand("<cword>")<CR><CR>
+" imap <F2> <ESC>:scs find g <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>s :scs find s <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>g :scs find g <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>c :scs find c <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>t :scs find t <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>e :scs find e <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>f :scs find f <C-R>=expand("<cfile>")<CR><CR>
+nmap <C-\>i :scs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+nmap <C-\>d :scs find d <C-R>=expand("<cword>")<CR><CR>
+
+" Hitting 'ESC' *twice* before the search type does the serach
+" with quickfix list
+"
+
+nmap <C-[><C-[>s :set cscopequickfix+=s-<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:set cscopequickfix-=s-<CR>
+nmap <C-[><C-[>g :set cscopequickfix+=g-<CR>:cs find g <C-R>=expand("<cword>")<CR><CR>:set cscopequickfix-=g-<CR>
+nmap <C-[><C-[>c :set cscopequickfix+=c-<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:set cscopequickfix-=c-<CR>
+nmap <C-[><C-[>t :set cscopequickfix+=t-<CR>:cs find t <C-R>=expand("<cword>")<CR><CR>:set cscopequickfix-=t-<CR>
+nmap <C-[><C-[>e :set cscopequickfix+=e-<CR>:cs find e <C-R>=expand("<cword>")<CR><CR>:set cscopequickfix-=e-<CR>
+nmap <C-[><C-[>i :set cscopequickfix+=i-<CR>:cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>:set cscopequickfixi=g-<CR>
+nmap <C-[><C-[>d :set cscopequickfix+=d-<CR>:cs find d <C-R>=expand("<cword>")<CR><CR>:set cscopequickfix-=d-<CR>
+
+set csverb
+set cst "search in both tags and cscope.out
+set cspc=4  "display last 3 lines
+
+" Don't use Ex mode
+map Q <C-g>
+
+" This is an alternative that also works in block mode, but the deleted
+" text is lost and it only works for putting the current register.
+vnoremap P "_dP
+
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if &t_Co == 1
+  syntax off
+  set nohlsearch
+endif
+
+" Load vimgdb mapping
+" set splitright
+" set splitbelow
+" run macros/gdb_mappings.vim
+
