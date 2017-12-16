@@ -25,19 +25,18 @@
 
 [tips.md](tips.md)
 
-### 查看更新日志：
 
-Note：
-增加了scope搜索代码的功能:在代码顶级目录下执行scope . 会在tmp目录下得到检索信息，用于代码搜索
-需要把bin/scope可执行文件放到PATH环境变量中，scope使用的快捷键:
-    ctrl+i 向前跳到前几次光标位置
-    ctrl+o 向后跳到后几次光标位置
-    Esc + e 相当于egrep 搜索
-    Esc + d  查找本函数调用的函数
-    Esc + c   查找调用本函数的函数
-    Esc + g   查找定义的地方
-安装步骤：
-1.原项目正常安装
-2.添加scope到PATH环境变量中即可
+### Note：
+1. 增加了scope搜索代码的功能:在代码顶级目录下执行'scope .' 会在tmp目录下得到检索信息，用于代码搜索
+- 需要把bin/scope可执行文件放到PATH环境变量中，scope使用的快捷键:
+-    ctrl+i 向前跳到前几次光标位置
+-    ctrl+o 向后跳到后几次光标位置
+-    Esc + e 相当于egrep 搜索
+-    Esc + d  查找本函数调用的函数
+-    Esc + c   查找调用本函数的函数
+-    Esc + g   查找定义的地方
+2. 安装步骤：
+- 1).原项目正常安装
+- 2).添加scope到PATH环境变量中即可
 
-本项目是在https://github.com/itscamp/vim.git基础上修改得到的，感谢原作者！
+本项目是在https://github.com/itscamp/vim.git 基础上修改得到的，感谢原作者！
