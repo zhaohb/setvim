@@ -1,0 +1,35 @@
+#!/bin/sh
+
+if [ "x$1" = "x"  ] ; then
+    echo "Usage: scope <rootpath>"
+    echo
+    exit -1
+fi
+if [ ! -d ~/tmp  ] ; then
+    mkdir -p ~/tmp
+fi
+if [ ! -d ~/tmp  ] ; then
+    echo "Can't find ~/tmp"
+    exit -1
+fi
+
+cd $1
+path=`pwd`
+
+if [ $# = 1  ]; then
+    find -P $path/ -name "*.[chsS]" -fprint ~/tmp/cscope.files
+#      find -L $path/src/include -name "*.us" >> ~/tmp/cscope.files
+#    find -L $path/test -name "*.[chsS]" >> ~/tmp/cscope.files
+#      cscope -kbq -i ~/tmp/cscope.files
+    cd ~/tmp
+    cscope -Rbq -i ~/tmp/cscope.files
+else
+A
+    cscope -Rbq
+fi
+
+#mv cscope.out ~/tmp -f
+#mv cscope.in.out ~/tmp -f
+#mv cscope.po.out ~/tmp -f
+# rm -f ~/tmp/src
+# ln -s $path ~/tmp/src
